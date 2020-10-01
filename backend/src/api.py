@@ -63,11 +63,12 @@ def get_drinks_detail(payload):
         or appropriate status code indicating reason for failure
 '''
 
+
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def post_drink(payload):
     form = request.get_json()
-    recipe = "[" + json.dumps(form.get('recipe')) + "]"
+    recipe = json.dumps(form.get('recipe'))
     title = form.get('title')
     drinks = Drink.query.all()
     for dr in drinks:
@@ -92,13 +93,14 @@ def post_drink(payload):
         or appropriate status code indicating reason for failure
 '''
 
+
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drink(payload, drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
 
     if not drink:
-            abort(404)
+        abort(404)
     initial_recipe = drink.recipe
     initial_title = drink.title
     form = request.get_json()
@@ -118,11 +120,11 @@ def patch_drink(payload, drink_id):
     drink.recipe = recipe
     drink.update()
 
-
     return jsonify({
         'succes': True,
         'drinks': [drink.long()]
     })
+
 
 '''
     DELETE /drinks/<id>
@@ -133,19 +135,21 @@ def patch_drink(payload, drink_id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+
+
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(payload, drink_id):
     drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     if not drink:
-            abort(404)
+        abort(404)
     drink.delete()
-
 
     return jsonify({
         'succes': True,
         'delete': drink_id
     })
+
 
 ## Error Handling
 
@@ -159,6 +163,7 @@ def unprocessable(error):
         "message": "unprocessable"
     }), 422
 
+
 # Not found
 
 @app.errorhandler(404)
@@ -168,6 +173,7 @@ def not_found(error):
         "error": 404,
         "message": "resource not found"
     }), 404
+
 
 # AuthError
 
